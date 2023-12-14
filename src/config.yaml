@@ -1,0 +1,150 @@
+forecast:
+  # number of weeks to forecast
+  forecast_n_weeks: 208
+  # iso-week which starts the training
+  start_of_training_iso_week: 1
+  # iso-week which starts test/prediction period
+  start_of_test_iso_week: 1
+  # iso-week which starts epi-year
+  start_of_epi_year_iso_week: 27
+skeleton:
+  year:
+    min: 2020
+    max: 2023
+  week:
+    min: 1
+    max: 53
+  age_start:
+    { '[0,15)': 0, '[15,65)': 15, '[65,75)': 65, '[75,85)': 75, '85+': 85 }
+  age_width:
+    { '[0,15)': 15, '[15,65)': 50, '[65,75)': 10, '[75,85)': 10, '85+': Inf }
+  sex: { Male: 'Male', Female: 'Female' }
+  region:
+    [
+      'AT',
+      'AU',
+      'BE',
+      'BG',
+      'CA',
+      'CH',
+      'CL',
+      'CZ',
+      'DE',
+      'DK',
+      'EE',
+      'ES',
+      'FI',
+      'FR',
+      'GB-EAW',
+      'GB-NIR',
+      'GB-SCT',
+      'GR',
+      'HR',
+      'HU',
+      'IL',
+      'IS',
+      'IT',
+      'KR',
+      'LT',
+      'LU',
+      'LV',
+      'NL',
+      'NO',
+      'NZ',
+      'PL',
+      'PT',
+      'RU',
+      'SE',
+      'SI',
+      'SK',
+      'TW',
+      'US',
+    ]
+aggregates:
+  analysis:
+    [
+      'AT',
+      #'AU',
+      'BE',
+      'BG',
+      #'CA',
+      'CH',
+      #'CL',
+      #'CZ',
+      'DE',
+      #'DK',
+      'EE',
+      'ES',
+      'FI',
+      'FR',
+      #'GB-EAW',
+      #'GB-NIR',
+      #'GB-SCT',
+      #'GR',
+      'HR',
+      'HU',
+      #'IL',
+      'IS',
+      #'IT',
+      #'KR',
+      'LT',
+      'LU',
+      'LV',
+      'NL',
+      'NO',
+      #'NZ',
+      'PL',
+      'PT',
+      #'RU',
+      'SE',
+      'SI',
+      'SK',
+      #'TW',
+      'US'
+    ]
+  europe:
+    [
+      'AT',
+      'BE',
+      'BG',
+      'CH',
+      'CZ',
+      'DE',
+      'DK',
+      'EE',
+      'ES',
+      'FI',
+      'FR',
+      'GB-EAW',
+      'GB-NIR',
+      'GB-SCT',
+      'GR',
+      'HR',
+      'HU',
+      'IS',
+      'IT',
+      'LT',
+      'LU',
+      'LV',
+      'NL',
+      'NO',
+      'PL',
+      'PT',
+      'SE',
+      'SI',
+      'SK',
+    ]
+  germany: ['DE']
+# European standard population
+# https://ec.europa.eu/eurostat/documents/3859598/5926869/KS-RA-13-028-EN.PDF/e713fa79-1add-44e8-b23d-5e8fa09b3f8f
+# page 121, Annex F
+stdpop:
+  {
+    '[0,15)': 16000,
+    '[15,65)': 64500,
+    '[65,75)': 10500,
+    '[75,85)': 6500,
+    '85+': 2500,
+  }
+models: ['AVR5y', 'AVC5y', 'KUK7y', 'SRF7y', 'SRF5y',
+         'GAM7y', 'GAM7yt', 'LGM7y', 'WHO5y']
