@@ -2,3 +2,5 @@
 *
 # Except this file
 !.gitignore
+excess_deaths.rds
+observed_and_expected_samples.rds

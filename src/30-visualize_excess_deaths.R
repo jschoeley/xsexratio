@@ -20,7 +20,15 @@ path <- list(
 )
 
 cnst <- list(
-  config = read_yaml(path$config)
+  config = read_yaml(path$config),
+  period = c(
+    `20` = '2020w05-w26',
+    `20/21` = '2020w27-21w26',
+    `21/22` = '2021w27-22w26',
+    `22/23` = '2022w27-23w26',
+    `23` = '2023w27-w52'
+  ),
+  rate_scaler = 1e5
 )
 
 # global functions and constants
@@ -33,340 +41,527 @@ fig <- list()
 
 excess$excess_measures <- readRDS(path$excess_deaths)
 
-# P-score sexdiff -------------------------------------------------
+# P-score sexdiff epi-year ----------------------------------------
 
-fig$pscoresexdiffage <- list()
+fig$pscoresexdiffepiyear <- list()
 
-fig$pscoresexdiffage$config <- list(
-  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
-  measure = 'psc_wkl_sdf'
+fig$pscoresexdiffepiyear$config <- list(
+  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US', 'PT'),
+  measure_diff = 'psc_int_sdf',
+  measure_f = 'psc_int_f',
+  measure_m = 'psc_int_m'
 )
 
-fig$pscoresexdiffage$data <-
-  excess$excess_measures %>%
-  filter(age_group != '[0,15)') %>%
-  filter(timeframe == 'monthly') %>%
+fig$pscoresexdiffepiyear$data_diff <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
   filter(
-   region_iso %in% fig$pscoresexdiffage$config$region_iso
-  ) %>%
-  mutate(date = ISOWeekDateToDate(iso_year, iso_week)) %>%
-  rename(
-    q05 = paste0(fig$pscoresexdiffage$config$measure, '_q05'),
-    q25 = paste0(fig$pscoresexdiffage$config$measure, '_q25'),
-    q50 = paste0(fig$pscoresexdiffage$config$measure, '_q50'),
-    q75 = paste0(fig$pscoresexdiffage$config$measure, '_q75'),
-    q95 = paste0(fig$pscoresexdiffage$config$measure, '_q95')
+   region_iso %in% fig$pscoresexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q05'),
+    q25 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q25'),
+    q50 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q50'),
+    q75 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q75'),
+    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q95')
   )
-
-fig$pscoresexdiffage$fig <-
-  fig$pscoresexdiffage$data %>%
-  ggplot(aes(x = date, group = model_id)) +
-  geom_hline(yintercept = 0, color = 'grey70', size = 1) +
-  geom_ribbon(
-    aes(ymax = q95, ymin = q05),
-    fill = 'blue', alpha = 0.3
-  ) +
-  geom_line(aes(y = q50)) +
-  scale_x_date(date_breaks = '1 year', date_labels = '%y') +
-  scale_y_continuous(
-    breaks = seq(-100, 100, 10)
-  ) +
-  scale_color_identity() +
-  scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'xy', panel_border = TRUE, axis = '') +
-  facet_grid(region_iso~age_group, scales = 'free_y') +
-  #coord_cartesian(expand = FALSE, ylim = c(-10, 40)) +
-  labs(
-    x = NULL,
-    title = 'Percentage point sex gap in male vs. female P-scores',
-    y = 'P-score male - P-score female',
-    family = 'roboto'
-  )
-fig$pscoresexdiffage$fig
-
-ExportFigure(
-  fig$pscoresexdiffage$fig, path = path$out, filename = 'pscoresexdiffage',
-  device = 'pdf',
-  width = figspec$fig_dims$width,
-  height = figspec$fig_dims$width, scale = 1.2
-)
-
-# P-score cumulative sexdiff --------------------------------------
-
-fig$pscorecumsexdiffage <- list()
-
-fig$pscorecumsexdiffage$config <- list(
-  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
-  measure = 'psc_cum_sdf'
-)
-
-fig$pscorecumsexdiffage$data <-
-  excess$excess_measures %>%
-  filter(age_group != '[0,15)') %>%
-  filter(timeframe == 'monthly') %>%
+fig$pscoresexdiffepiyear$data_f <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
   filter(
-    region_iso %in% fig$pscorecumsexdiffage$config$region_iso
-  ) %>%
-  mutate(date = ISOWeekDateToDate(iso_year, iso_week)) %>%
-  rename(
-    q05 = paste0(fig$pscorecumsexdiffage$config$measure, '_q05'),
-    q25 = paste0(fig$pscorecumsexdiffage$config$measure, '_q25'),
-    q50 = paste0(fig$pscorecumsexdiffage$config$measure, '_q50'),
-    q75 = paste0(fig$pscorecumsexdiffage$config$measure, '_q75'),
-    q95 = paste0(fig$pscorecumsexdiffage$config$measure, '_q95')
+    region_iso %in% fig$pscoresexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q05'),
+    q25 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q25'),
+    q50 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q50'),
+    q75 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q75'),
+    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q95')
   )
-fig$pscorecumsexdiffage$labels <-
-  fig$pscorecumsexdiffage$data %>%
-  drop_na(obs_wkl_t) %>%
-  filter(date == max(date))
-
-fig$pscorecumsexdiffage$fig <-
-  fig$pscorecumsexdiffage$data %>%
-  ggplot(aes(x = date, group = model_id)) +
-  geom_hline(yintercept = 0, color = 'grey70', size = 1) +
-  geom_ribbon(
-    aes(ymax = q95, ymin = q05),
-    fill = 'blue', alpha = 0.3
-  ) +
-  geom_line(aes(y = q50)) +
-  # geom_line(
-  #   aes(x = date, y = q50, group = group),
-  #   data = fig$pscores$data %>% rename(group = model_id),
-  #   inherit.aes = FALSE, alpha = 0.3
-  # ) +
-  geom_label(
-    aes(
-      x = date, y = -10,
-      label = paste0(
-        formatC(q50, format = 'f', flag = '+', digits = 2), '%', '\n',
-        formatC(q05, format = 'f', digits = 2), '–',
-        formatC(q95, format = 'f', digits = 2)
-      )
-    ),
-    hjust = 1, size = 3, vjust = 1,
-    label.padding = unit(1, 'pt'), label.size = 0, label.r = unit(0, 'pt'),
-    data = fig$pscorecumsexdiffage$labels,
-    inherit.aes = FALSE,
-    color = 'black', alpha = 0.7
-  ) +
-  scale_x_date(date_breaks = '1 year', date_labels = '%y') +
-  scale_y_continuous(
-    breaks = seq(-100, 100, 5)
-  ) +
-  scale_color_identity() +
-  scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'xy', panel_border = TRUE, axis = '') +
-  facet_grid(region_iso~age_group) +
-  #coord_cartesian(expand = FALSE, ylim = c(-10, 40)) +
-  labs(
-    title = 'Cumulative percentage point sex gap in male vs. female P-scores',
-    y = 'Cumulative P-score male - Cumulative P-score female',
-    family = 'roboto'
-  )
-fig$pscorecumsexdiffage$fig
-
-ExportFigure(
-  fig$pscorecumsexdiffage$fig, path = path$out, filename = 'pscorecumsexdiffage',
-  device = 'pdf',
-  width = figspec$fig_dims$width,
-  height = figspec$fig_dims$width, scale = 1.2
-)
-
-# P-score sex diff annual -----------------------------------------
-
-fig$pscoresexdiffageannual <- list()
-
-fig$pscoresexdiffageannual$config <- list(
-  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
-  measure = 'psc_wkl_sdf'
-)
-
-fig$pscoresexdiffageannual$data <-
-  excess$excess_measures %>%
-  filter(age_group != '[0,15)') %>%
-  filter(timeframe == 'annual') %>%
+fig$pscoresexdiffepiyear$data_m <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
   filter(
-    region_iso %in% fig$pscoresexdiffageannual$config$region_iso
-  ) %>%
-  rename(
-    q05 = paste0(fig$pscoresexdiffageannual$config$measure, '_q05'),
-    q25 = paste0(fig$pscoresexdiffageannual$config$measure, '_q25'),
-    q50 = paste0(fig$pscoresexdiffageannual$config$measure, '_q50'),
-    q75 = paste0(fig$pscoresexdiffageannual$config$measure, '_q75'),
-    q95 = paste0(fig$pscoresexdiffageannual$config$measure, '_q95')
+    region_iso %in% fig$pscoresexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q05'),
+    q25 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q25'),
+    q50 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q50'),
+    q75 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q75'),
+    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q95')
   )
-fig$pscoresexdiffageannual$labels <-
-  fig$pscoresexdiffageannual$data %>%
-  drop_na(obs_wkl_t) %>%
-  filter(iso_year == max(iso_year))
 
-fig$pscoresexdiffageannual$fig <-
-  fig$pscoresexdiffageannual$data %>%
-  ggplot(aes(x = iso_year, group = model_id)) +
+fig$pscoresexdiffepiyear$fig <-
+  fig$pscoresexdiffepiyear$data_diff |>
+  ggplot(aes(x = timeframe_value)) +
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
   geom_pointrange(
     aes(ymax = q95, ymin = q05, y = q50), fatten = 1
   ) +
-  geom_line(aes(y = q50)) +
-  # geom_line(
-  #   aes(x = date, y = q50, group = group),
-  #   data = fig$pscores$data %>% rename(group = model_id),
-  #   inherit.aes = FALSE, alpha = 0.3
-  # ) +
-  #scale_x_date(date_breaks = '1 year', date_labels = '%y') +
+  geom_line(aes(y = q50, group = '1')) +
+  geom_pointrange(
+    aes(ymax = q95*1/4, ymin = q05*1/4, y = q50*1/4), fatten = 1,
+    color = figspec$colors$sex['Female'],
+    position = position_nudge(x = 0.1),
+    data = fig$pscoresexdiffepiyear$data_f
+  ) +
+  geom_pointrange(
+    aes(ymax = q95*1/4, ymin = q05*1/4, y = q50*1/4), fatten = 1,
+    color = figspec$colors$sex['Male'],
+    position = position_nudge(x = -0.1),
+    data = fig$pscoresexdiffepiyear$data_m
+  ) +
   scale_y_continuous(
-    breaks = seq(-100, 100, 5)
+    breaks = seq(-100, 100, 2.5),
+    sec.axis = sec_axis(~.x*4, name = 'Male and female P-score')
   ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'xy', panel_border = TRUE, axis = '') +
-  facet_grid(region_iso~age_group, scales = 'free_y') +
-  #coord_cartesian(expand = FALSE, ylim = c(-10, 40)) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = TRUE, axis = '') +
+  #facet_grid(region_iso~age_group, scales = 'free_y') +
+  facet_wrap(~region_iso) +
   labs(
-    title = 'Percentage point sex gap in male vs. female annual P-scores',
-    y = 'P-score male - P-score female',
+#    title = 'Percentage point sex gap in male vs. female annual P-scores',
+    y = 'P-score difference male - female',
+    caption = paste(
+      unlist(map2(names(cnst$period), cnst$period, paste, sep = ': ')),
+      collapse = ', '
+    ),
     x = NULL,
     family = 'roboto'
   )
-fig$pscoresexdiffageannual$fig
+fig$pscoresexdiffepiyear$fig
 
 ExportFigure(
-  fig$pscoresexdiffageannual$fig, path = path$out, filename = 'pscoresexdiffageannual',
+  fig$pscoresexdiffepiyear$fig, path = path$out,
+  filename = '30-pscoresexdiffepiyear',
   device = 'pdf',
   width = figspec$fig_dims$width,
-  height = figspec$fig_dims$width, scale = 1.2
+  height = figspec$fig_dims$width*0.8,
+  scale = 1
 )
 
-# Excess sexdiff --------------------------------------------------
+# P-score sexdiff by age over epi-year ----------------------------
 
-fig$xc1sexdiff <- list()
+fig$pscoresexdiffageepiyear <- list()
 
-fig$xc1sexdiff$config <- list(
-  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
-  measure = 'xc1_wkl_sdf'
+fig$pscoresexdiffageepiyear$config <- list(
+  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US', 'PT'),
+  measure_diff = 'psc_int_sdf',
+  measure_f = 'psc_int_f',
+  measure_m = 'psc_int_m'
 )
 
-fig$xc1sexdiff$data <-
-  excess$excess_measures %>%
-  filter(age_group != '[0,15)') %>%
-  filter(timeframe == 'monthly') %>%
+fig$pscoresexdiffageepiyear$data_diff <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
   filter(
-    region_iso %in% fig$xc1sexdiff$config$region_iso
-  ) %>%
-  mutate(date = ISOWeekDateToDate(iso_year, iso_week)) %>%
-  rename(
-    q05 = paste0(fig$xc1sexdiff$config$measure, '_q05'),
-    q25 = paste0(fig$xc1sexdiff$config$measure, '_q25'),
-    q50 = paste0(fig$xc1sexdiff$config$measure, '_q50'),
-    q75 = paste0(fig$xc1sexdiff$config$measure, '_q75'),
-    q95 = paste0(fig$xc1sexdiff$config$measure, '_q95')
-  ) %>%
-  mutate(across(c(q05, q25, q50, q75, q95), ~.x/personweeks)*1e5)
-fig$xc1sexdiff$labels <-
-  fig$xc1sexdiff$data %>%
-  drop_na(obs_wkl_t) %>%
-  filter(date == max(date))
+    region_iso %in% fig$pscoresexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q05'),
+    q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q25'),
+    q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q50'),
+    q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q75'),
+    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q95')
+  )
+fig$pscoresexdiffageepiyear$data_f <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$pscoresexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q05'),
+    q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q25'),
+    q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q50'),
+    q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q75'),
+    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q95')
+  )
+fig$pscoresexdiffageepiyear$data_m <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$pscoresexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q05'),
+    q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q25'),
+    q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q50'),
+    q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q75'),
+    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q95')
+  )
 
-fig$xc1sexdiff$fig <-
-  fig$xc1sexdiff$data %>%
-  ggplot(aes(x = date, group = model_id)) +
+fig$pscoresexdiffageepiyear$fig <-
+  fig$pscoresexdiffageepiyear$data_diff |>
+  ggplot(aes(x = timeframe_value)) +
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
-  geom_ribbon(
-    aes(ymax = q95, ymin = q05),
-    fill = 'blue', alpha = 0.3
+  geom_pointrange(
+    aes(
+      ymax = q95,
+      ymin = q05,
+      y = q50
+    ),
+    fatten = 1
   ) +
-  geom_line(aes(y = q50)) +
-  # geom_line(
-  #   aes(x = date, y = q50, group = group),
-  #   data = fig$pscores$data %>% rename(group = model_id),
-  #   inherit.aes = FALSE, alpha = 0.3
-  # ) +
-  scale_x_date(date_breaks = '1 year', date_labels = '%y') +
-  # scale_y_continuous(
-  #   breaks = seq(-100, 100, 10)
-  # ) +
+  geom_line(aes(y = q50, group = '1')) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4,
+      ymin = q05*1/4,
+      y = q50*1/4
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Female'],
+    position = position_nudge(x = 0.1),
+    data = fig$pscoresexdiffageepiyear$data_f
+  ) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4,
+      ymin = q05*1/4,
+      y = q50*1/4
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Male'],
+    position = position_nudge(x = -0.1),
+    data = fig$pscoresexdiffageepiyear$data_m
+  ) +
+  scale_y_continuous(
+    breaks = seq(-100, 100, 2.5),
+    sec.axis = sec_axis(~.x*4, name = 'Male and female P-score',
+                        breaks = seq(-100, 100, 2.5)*4)
+  ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'xy', panel_border = TRUE, axis = '') +
-  facet_grid(region_iso~age_group, scales = 'free_y') +
-  #coord_cartesian(expand = FALSE, ylim = c(-10, 40)) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = TRUE, axis = '', size = 5) +
+  facet_grid(age_group~region_iso, scales = 'fixed') +
   labs(
-    x = NULL, y = 'Percent excess deaths',
-    title = 'Percent excess deaths Germany by age',
+    #title = 'Sex gap in male vs. female P-scores',
+    y = 'P-score difference male - female',
+    caption = paste(
+      unlist(map2(names(cnst$period), cnst$period, paste, sep = ': ')),
+      collapse = ', '
+    ),
+    x = NULL,
     family = 'roboto'
   )
-fig$xc1sexdiff$fig
+fig$pscoresexdiffageepiyear$fig
 
 ExportFigure(
-  fig$pscoresage$fig, path = path$out, filename = 'pscores_age_de',
+  fig$pscoresexdiffageepiyear$fig, path = path$out,
+  filename = '30-pscoresexdiffageepiyear',
   device = 'pdf',
   width = figspec$fig_dims$width,
-  height = figspec$fig_dims$width, scale = 1.2
+  height = figspec$fig_dims$width*0.8,
+  scale = 1
 )
 
-# Excess by sex ---------------------------------------------------
+# Excess mortality sexdiff epi-year -------------------------------
 
-fig$xc1bysex <- list()
+fig$excessratesexdiffepiyear <- list()
 
-fig$xc1bysex$config <- list(
-  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
-  measure = 'xc1_wkl_sdf'
+fig$excessratesexdiffepiyear$config <- list(
+  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US', 'PT'),
+  measure_diff = 'xr1_int_sdf',
+  measure_f = 'xr1_int_f',
+  measure_m = 'xr1_int_m'
 )
 
-fig$xc1bysex$data <-
-  excess$excess_measures %>%
-  filter(age_group != '[0,15)') %>%
-  filter(timeframe == 'monthly') %>%
+fig$excessratesexdiffepiyear$data_diff <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
   filter(
-    region_iso %in% fig$xc1bysex$config$region_iso
-  ) %>%
-  mutate(date = ISOWeekDateToDate(iso_year, iso_week)) %>%
-  rename(
-    q05 = paste0(fig$xc1bysex$config$measure, '_q05'),
-    q25 = paste0(fig$xc1bysex$config$measure, '_q25'),
-    q50 = paste0(fig$xc1bysex$config$measure, '_q50'),
-    q75 = paste0(fig$xc1bysex$config$measure, '_q75'),
-    q95 = paste0(fig$xc1bysex$config$measure, '_q95')
-  ) %>%
-  mutate(across(c(q05, q25, q50, q75, q95), ~.x/personweeks)*1e5)
-fig$xc1bysex$labels <-
-  fig$xc1bysex$data %>%
-  drop_na(obs_wkl_t) %>%
-  filter(date == max(date))
+    region_iso %in% fig$excessratesexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q05'),
+    q25 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q25'),
+    q50 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q50'),
+    q75 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q75'),
+    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q95')
+  )
+fig$excessratesexdiffepiyear$data_f <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$excessratesexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q05'),
+    q25 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q25'),
+    q50 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q50'),
+    q75 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q75'),
+    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q95')
+  )
+fig$excessratesexdiffepiyear$data_m <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  #filter(age_group != '[0,15)') |>
+  filter(age_group == 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$excessratesexdiffepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q05'),
+    q25 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q25'),
+    q50 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q50'),
+    q75 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q75'),
+    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q95')
+  )
 
-fig$xc1bysex$fig <-
-  fig$xc1bysex$data %>%
-  ggplot(aes(x = date, group = model_id)) +
+fig$excessratesexdiffepiyear$fig <-
+  fig$excessratesexdiffepiyear$data_diff |>
+  ggplot(aes(x = timeframe_value)) +
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
-  geom_ribbon(
-    aes(ymax = q95, ymin = q05),
-    fill = 'blue', alpha = 0.3
+  geom_pointrange(
+    aes(
+      ymax = q95*cnst$rate_scaler,
+      ymin = q05*cnst$rate_scaler,
+      y = q50*cnst$rate_scaler
+    ),
+    fatten = 1
   ) +
-  geom_line(aes(y = q50)) +
-  # geom_line(
-  #   aes(x = date, y = q50, group = group),
-  #   data = fig$pscores$data %>% rename(group = model_id),
-  #   inherit.aes = FALSE, alpha = 0.3
-  # ) +
-  scale_x_date(date_breaks = '1 year', date_labels = '%y') +
-  # scale_y_continuous(
-  #   breaks = seq(-100, 100, 10)
-  # ) +
+  geom_line(aes(y = q50*cnst$rate_scaler, group = '1')) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4*cnst$rate_scaler,
+      ymin = q05*1/4*cnst$rate_scaler,
+      y = q50*1/4*cnst$rate_scaler
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Female'],
+    position = position_nudge(x = 0.1),
+    data = fig$excessratesexdiffepiyear$data_f
+  ) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4*cnst$rate_scaler,
+      ymin = q05*1/4*cnst$rate_scaler,
+      y = q50*1/4*cnst$rate_scaler
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Male'],
+    position = position_nudge(x = -0.1),
+    data = fig$excessratesexdiffepiyear$data_m
+  ) +
+  scale_y_continuous(
+    breaks = seq(-100, 300, 20),
+    sec.axis =
+      sec_axis(~.x*4, name = 'Female and male excess death rate (per 100,000 person-years)',
+               breaks = seq(-100, 300, 20)*4)
+  ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'xy', panel_border = TRUE, axis = '') +
-  facet_grid(region_iso~age_group, scales = 'free_y') +
-  #coord_cartesian(expand = FALSE, ylim = c(-10, 40)) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = TRUE, axis = '') +
+  #facet_grid(region_iso~age_group, scales = 'free_y') +
+  facet_wrap(~region_iso) +
   labs(
-    x = NULL, y = 'Percent excess deaths',
-    title = 'Percent excess deaths Germany by age',
+    #title = 'Sex gap in male vs. female excess death rates',
+    y = 'Excess death rate difference male - female (per 100,000 person-years)',
+    caption = paste(
+      unlist(map2(names(cnst$period), cnst$period, paste, sep = ': ')),
+      collapse = ', '
+    ),
+    x = NULL,
     family = 'roboto'
   )
-fig$xc1bysex$fig
+fig$excessratesexdiffepiyear$fig
 
 ExportFigure(
-  fig$pscoresage$fig, path = path$out, filename = 'pscores_age_de',
+  fig$excessratesexdiffepiyear$fig, path = path$out,
+  filename = '30-excessratesexdiffepiyear',
   device = 'pdf',
   width = figspec$fig_dims$width,
-  height = figspec$fig_dims$width, scale = 1.2
+  height = figspec$fig_dims$width*0.8,
+  scale = 1
+)
+
+# Excess mortality sexdiff by age over epi-year -------------------
+
+fig$excessratesexdiffageepiyear <- list()
+
+fig$excessratesexdiffageepiyear$config <- list(
+  region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US', 'PT'),
+  measure_diff = 'xr1_int_sdf',
+  measure_f = 'xr1_int_f',
+  measure_m = 'xr1_int_m'
+)
+
+fig$excessratesexdiffageepiyear$data_diff <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$excessratesexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q05'),
+    q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q25'),
+    q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q50'),
+    q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q75'),
+    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q95')
+  )
+fig$excessratesexdiffageepiyear$data_f <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$excessratesexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q05'),
+    q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q25'),
+    q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q50'),
+    q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q75'),
+    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q95')
+  )
+fig$excessratesexdiffageepiyear$data_m <-
+  excess$excess_measures |>
+  mutate(timeframe_value =
+           factor(timeframe_value, cnst$period, names(cnst$period))
+  ) |>
+  filter(age_group != '[0,15)') |>
+  filter(age_group != 'Total') |>
+  filter(timeframe == 'epiyear') |>
+  filter(
+    region_iso %in% fig$excessratesexdiffageepiyear$config$region_iso
+  ) |>
+  select(
+    region_iso, age_group, timeframe_value,
+    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q05'),
+    q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q25'),
+    q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q50'),
+    q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q75'),
+    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q95')
+  )
+
+fig$excessratesexdiffageepiyear$fig <-
+  fig$excessratesexdiffageepiyear$data_diff |>
+  ggplot(aes(x = timeframe_value)) +
+  geom_hline(yintercept = 0, color = 'grey70', size = 1) +
+  geom_pointrange(
+    aes(
+      ymax = q95*cnst$rate_scaler,
+      ymin = q05*cnst$rate_scaler,
+      y = q50*cnst$rate_scaler
+    ),
+    fatten = 1
+  ) +
+  geom_line(aes(y = q50*cnst$rate_scaler, group = '1')) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4*cnst$rate_scaler,
+      ymin = q05*1/4*cnst$rate_scaler,
+      y = q50*1/4*cnst$rate_scaler
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Female'],
+    position = position_nudge(x = 0.1),
+    data = fig$excessratesexdiffageepiyear$data_f
+  ) +
+  geom_pointrange(
+    aes(
+      ymax = q95*1/4*cnst$rate_scaler,
+      ymin = q05*1/4*cnst$rate_scaler,
+      y = q50*1/4*cnst$rate_scaler
+    ),
+    fatten = 1,
+    color = figspec$colors$sex['Male'],
+    position = position_nudge(x = -0.1),
+    data = fig$excessratesexdiffageepiyear$data_m
+  ) +
+  scale_y_continuous(
+    #breaks = seq(-200, 900, 50),
+    sec.axis =
+      sec_axis(~.x*4, name = 'Female and male excess death rate (per 100,000 person-years)',
+               #breaks = seq(-200, 900, 50)*4
+               )
+  ) +
+  scale_color_identity() +
+  scale_fill_identity() +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = TRUE, axis = '', size = 5) +
+  facet_grid(age_group~region_iso, scales = 'free_y') +
+  labs(
+    #title = 'Sex gap in male vs. female excess death rates',
+    y = 'Excess death rate difference male - female (per 100,000 person-years)',
+    caption = paste(
+      unlist(map2(names(cnst$period), cnst$period, paste, sep = ': ')),
+      collapse = ', '
+    ),
+    x = NULL,
+    family = 'roboto'
+  )
+fig$excessratesexdiffageepiyear$fig
+
+ExportFigure(
+  fig$excessratesexdiffageepiyear$fig, path = path$out,
+  filename = '30-excessratesexdiffageepiyear',
+  device = 'pdf',
+  width = figspec$fig_dims$width,
+  height = figspec$fig_dims$width*0.8,
+  scale = 1
 )
