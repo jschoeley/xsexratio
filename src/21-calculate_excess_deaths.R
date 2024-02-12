@@ -252,45 +252,48 @@ excess$observed_and_expected_epiyear <-
   ungroup()
 
 # by month
-# excess$observed_and_expected_monthly <-
-#   excess$observed_and_expected_weekly |>
-#   mutate(iso_week = case_when(
-#     iso_week %in% 1:4   ~ 1*4,
-#     iso_week %in% 5:8   ~ 2*4,
-#     iso_week %in% 9:12  ~ 3*4,
-#     iso_week %in% 13:16 ~ 4*4,
-#     iso_week %in% 17:20 ~ 5*4,
-#     iso_week %in% 21:24 ~ 6*4,
-#     iso_week %in% 25:28 ~ 7*4,
-#     iso_week %in% 29:32 ~ 8*4,
-#     iso_week %in% 33:36 ~ 9*4,
-#     iso_week %in% 37:40 ~ 10*4,
-#     iso_week %in% 41:44 ~ 11*4,
-#     iso_week %in% 45:48 ~ 12*4,
-#     iso_week %in% 49:53 ~ 13*4,
-#     TRUE ~ 5
-#   )) |>
-#   group_by(cv_id, cv_sample, region_iso, model_id, age_group,
-#            sex, iso_year, iso_week) |>
-#   summarise(
-#     date = ISOWeekDateToDate(iso_year, iso_week)[1],
-#     across(c(personweeks, deaths_predicted, deaths_observed,
-#              covid_cases, covid_deaths,
-#              matches('deaths_sim[[:digit:]]+$'),
-#              stdpop, deaths_observed_std, deaths_predicted_std,
-#              matches('deaths_sim[[:digit:]]+_std$')
-#     ), ~sum(.x, na.rm = TRUE))
-#   ) |>
-#   ungroup()
+excess$observed_and_expected_monthly <-
+  excess$observed_and_expected_weekly |>
+  filter(date >= cnst$analysis_start, date <= cnst$analysis_end) |>
+  mutate(
+    iso_week = case_when(
+      iso_week %in% 1:4   ~ 1*4,
+      iso_week %in% 5:8   ~ 2*4,
+      iso_week %in% 9:12  ~ 3*4,
+      iso_week %in% 13:16 ~ 4*4,
+      iso_week %in% 17:20 ~ 5*4,
+      iso_week %in% 21:24 ~ 6*4,
+      iso_week %in% 25:28 ~ 7*4,
+      iso_week %in% 29:32 ~ 8*4,
+      iso_week %in% 33:36 ~ 9*4,
+      iso_week %in% 37:40 ~ 10*4,
+      iso_week %in% 41:44 ~ 11*4,
+      iso_week %in% 45:48 ~ 12*4,
+      iso_week %in% 49:53 ~ 13*4
+    ),
+    timeframe_value = paste(iso_year, formatC(iso_week, flag = '0', width = 2), sep = '-'),
+  ) |>
+  group_by(cv_id, cv_sample, region_iso, model_id, age_group,
+           sex, timeframe_value) |>
+  summarise(
+    iso_year = as.numeric(substr(first(timeframe_value), 1, 4)),
+    iso_week = as.numeric(substr(first(timeframe_value), 6, 7)),
+    date = ISOWeekDateToDate(iso_year, iso_week),
+    across(c(personweeks, deaths_predicted, deaths_observed,
+             covid_cases, covid_deaths,
+             matches('deaths_sim[[:digit:]]+$'),
+             stdpop, deaths_observed_std, deaths_predicted_std,
+             matches('deaths_sim[[:digit:]]+_std$')
+    ), ~sum(.x, na.rm = TRUE))
+  ) |>
+  ungroup()
 
 # combine
 excess$observed_and_expected_combined <- bind_rows(
   pandemic = excess$observed_and_expected_pandemic,
   weekly = excess$observed_and_expected_weekly,
   epiyear = excess$observed_and_expected_epiyear,
-  #annual = excess$observed_and_expected_annual,
-  #quarter = excess$observed_and_expected_quarter,
-  #monthly = excess$observed_and_expected_monthly,
+  monthly = excess$observed_and_expected_monthly,
   .id = 'timeframe'
 )
 
