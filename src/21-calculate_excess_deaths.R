@@ -318,7 +318,8 @@ excess$varnames_simdeath_std <-
        colnames(excess$observed_and_expected), value = TRUE)
 
 # define quantiles
-excess$quantiles1 <- c('q05' = 0.05, 'q25' = 0.25, 'q50' = 0.5, 'q75' = 0.75, 'q95' = 0.95)
+excess$quantiles1 <- c('q025' = 0.025, 'q05' = 0.05, 'q25' = 0.25,
+                       'q50' = 0.5, 'q75' = 0.75, 'q95' = 0.95, 'q975' = 0.975)
 excess$quantiles2 <- c('q50' = 0.5, 'q70' = 0.70, 'q90' = 0.9, 'q95' = 0.95, 'q99' = 0.99)
 
 excess$excess_measures <-

@@ -67,11 +67,11 @@ fig$pscoresexdiffepiyear$data_diff <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q05'),
+    q025 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q025'),
     q25 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q25'),
     q50 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q50'),
     q75 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q75'),
-    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q95')
+    q975 = paste0(fig$pscoresexdiffepiyear$config$measure_diff, '_q975')
   )
 fig$pscoresexdiffepiyear$data_f <-
   excess$excess_measures |>
@@ -86,11 +86,11 @@ fig$pscoresexdiffepiyear$data_f <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q05'),
+    q025 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q025'),
     q25 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q25'),
     q50 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q50'),
     q75 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q75'),
-    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q95')
+    q975 = paste0(fig$pscoresexdiffepiyear$config$measure_f, '_q975')
   )
 fig$pscoresexdiffepiyear$data_m <-
   excess$excess_measures |>
@@ -105,11 +105,11 @@ fig$pscoresexdiffepiyear$data_m <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q05'),
+    q025 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q025'),
     q25 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q25'),
     q50 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q50'),
     q75 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q75'),
-    q95 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q95')
+    q975 = paste0(fig$pscoresexdiffepiyear$config$measure_m, '_q975')
   )
 
 fig$pscoresexdiffepiyear$fig <-
@@ -117,17 +117,17 @@ fig$pscoresexdiffepiyear$fig <-
   ggplot(aes(x = timeframe_value)) +
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
   geom_pointrange(
-    aes(ymax = q95, ymin = q05, y = q50), fatten = 1
+    aes(ymax = q975, ymin = q025, y = q50), fatten = 1
   ) +
   geom_line(aes(y = q50, group = '1')) +
   geom_pointrange(
-    aes(ymax = q95*1/4, ymin = q05*1/4, y = q50*1/4), fatten = 1,
+    aes(ymax = q975*1/4, ymin = q025*1/4, y = q50*1/4), fatten = 1,
     color = figspec$colors$sex['Female'],
     position = position_nudge(x = 0.1),
     data = fig$pscoresexdiffepiyear$data_f
   ) +
   geom_pointrange(
-    aes(ymax = q95*1/4, ymin = q05*1/4, y = q50*1/4), fatten = 1,
+    aes(ymax = q975*1/4, ymin = q025*1/4, y = q50*1/4), fatten = 1,
     color = figspec$colors$sex['Male'],
     position = position_nudge(x = -0.1),
     data = fig$pscoresexdiffepiyear$data_m
@@ -186,11 +186,11 @@ fig$pscoresexdiffageepiyear$data_diff <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q05'),
+    q025 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q025'),
     q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q25'),
     q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q50'),
     q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q75'),
-    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q95')
+    q975 = paste0(fig$pscoresexdiffageepiyear$config$measure_diff, '_q975')
   )
 fig$pscoresexdiffageepiyear$data_f <-
   excess$excess_measures |>
@@ -205,11 +205,11 @@ fig$pscoresexdiffageepiyear$data_f <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q05'),
+    q025 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q025'),
     q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q25'),
     q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q50'),
     q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q75'),
-    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q95')
+    q975 = paste0(fig$pscoresexdiffageepiyear$config$measure_f, '_q975')
   )
 fig$pscoresexdiffageepiyear$data_m <-
   excess$excess_measures |>
@@ -224,11 +224,11 @@ fig$pscoresexdiffageepiyear$data_m <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q05'),
+    q025 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q025'),
     q25 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q25'),
     q50 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q50'),
     q75 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q75'),
-    q95 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q95')
+    q975 = paste0(fig$pscoresexdiffageepiyear$config$measure_m, '_q975')
   )
 
 fig$pscoresexdiffageepiyear$fig <-
@@ -237,8 +237,8 @@ fig$pscoresexdiffageepiyear$fig <-
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
   geom_pointrange(
     aes(
-      ymax = q95,
-      ymin = q05,
+      ymax = q975,
+      ymin = q025,
       y = q50
     ),
     fatten = 1
@@ -246,8 +246,8 @@ fig$pscoresexdiffageepiyear$fig <-
   geom_line(aes(y = q50, group = '1')) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4,
-      ymin = q05*1/4,
+      ymax = q975*1/4,
+      ymin = q025*1/4,
       y = q50*1/4
     ),
     fatten = 1,
@@ -257,8 +257,8 @@ fig$pscoresexdiffageepiyear$fig <-
   ) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4,
-      ymin = q05*1/4,
+      ymax = q975*1/4,
+      ymin = q025*1/4,
       y = q50*1/4
     ),
     fatten = 1,
@@ -320,11 +320,11 @@ fig$excessratesexdiffepiyear$data_diff <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q05'),
+    q025 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q025'),
     q25 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q25'),
     q50 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q50'),
     q75 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q75'),
-    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q95')
+    q975 = paste0(fig$excessratesexdiffepiyear$config$measure_diff, '_q975')
   )
 fig$excessratesexdiffepiyear$data_f <-
   excess$excess_measures |>
@@ -339,11 +339,11 @@ fig$excessratesexdiffepiyear$data_f <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q05'),
+    q025 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q025'),
     q25 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q25'),
     q50 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q50'),
     q75 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q75'),
-    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q95')
+    q975 = paste0(fig$excessratesexdiffepiyear$config$measure_f, '_q975')
   )
 fig$excessratesexdiffepiyear$data_m <-
   excess$excess_measures |>
@@ -358,11 +358,11 @@ fig$excessratesexdiffepiyear$data_m <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q05'),
+    q025 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q025'),
     q25 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q25'),
     q50 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q50'),
     q75 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q75'),
-    q95 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q95')
+    q975 = paste0(fig$excessratesexdiffepiyear$config$measure_m, '_q975')
   )
 
 fig$excessratesexdiffepiyear$fig <-
@@ -371,8 +371,8 @@ fig$excessratesexdiffepiyear$fig <-
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
   geom_pointrange(
     aes(
-      ymax = q95*cnst$rate_scaler,
-      ymin = q05*cnst$rate_scaler,
+      ymax = q975*cnst$rate_scaler,
+      ymin = q025*cnst$rate_scaler,
       y = q50*cnst$rate_scaler
     ),
     fatten = 1
@@ -380,8 +380,8 @@ fig$excessratesexdiffepiyear$fig <-
   geom_line(aes(y = q50*cnst$rate_scaler, group = '1')) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4*cnst$rate_scaler,
-      ymin = q05*1/4*cnst$rate_scaler,
+      ymax = q975*1/4*cnst$rate_scaler,
+      ymin = q025*1/4*cnst$rate_scaler,
       y = q50*1/4*cnst$rate_scaler
     ),
     fatten = 1,
@@ -391,8 +391,8 @@ fig$excessratesexdiffepiyear$fig <-
   ) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4*cnst$rate_scaler,
-      ymin = q05*1/4*cnst$rate_scaler,
+      ymax = q975*1/4*cnst$rate_scaler,
+      ymin = q025*1/4*cnst$rate_scaler,
       y = q50*1/4*cnst$rate_scaler
     ),
     fatten = 1,
@@ -456,11 +456,11 @@ fig$excessratesexdiffageepiyear$data_diff <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q05'),
+    q025 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q025'),
     q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q25'),
     q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q50'),
     q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q75'),
-    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q95')
+    q975 = paste0(fig$excessratesexdiffageepiyear$config$measure_diff, '_q975')
   )
 fig$excessratesexdiffageepiyear$data_f <-
   excess$excess_measures |>
@@ -475,11 +475,11 @@ fig$excessratesexdiffageepiyear$data_f <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q05'),
+    q025 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q025'),
     q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q25'),
     q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q50'),
     q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q75'),
-    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q95')
+    q975 = paste0(fig$excessratesexdiffageepiyear$config$measure_f, '_q975')
   )
 fig$excessratesexdiffageepiyear$data_m <-
   excess$excess_measures |>
@@ -494,11 +494,11 @@ fig$excessratesexdiffageepiyear$data_m <-
   ) |>
   select(
     region_iso, age_group, timeframe_value,
-    q05 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q05'),
+    q025 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q025'),
     q25 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q25'),
     q50 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q50'),
     q75 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q75'),
-    q95 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q95')
+    q975 = paste0(fig$excessratesexdiffageepiyear$config$measure_m, '_q975')
   )
 
 fig$excessratesexdiffageepiyear$fig <-
@@ -507,8 +507,8 @@ fig$excessratesexdiffageepiyear$fig <-
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
   geom_pointrange(
     aes(
-      ymax = q95*cnst$rate_scaler,
-      ymin = q05*cnst$rate_scaler,
+      ymax = q975*cnst$rate_scaler,
+      ymin = q025*cnst$rate_scaler,
       y = q50*cnst$rate_scaler
     ),
     fatten = 1
@@ -516,8 +516,8 @@ fig$excessratesexdiffageepiyear$fig <-
   geom_line(aes(y = q50*cnst$rate_scaler, group = '1')) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4*cnst$rate_scaler,
-      ymin = q05*1/4*cnst$rate_scaler,
+      ymax = q975*1/4*cnst$rate_scaler,
+      ymin = q025*1/4*cnst$rate_scaler,
       y = q50*1/4*cnst$rate_scaler
     ),
     fatten = 1,
@@ -527,8 +527,8 @@ fig$excessratesexdiffageepiyear$fig <-
   ) +
   geom_pointrange(
     aes(
-      ymax = q95*1/4*cnst$rate_scaler,
-      ymin = q05*1/4*cnst$rate_scaler,
+      ymax = q975*1/4*cnst$rate_scaler,
+      ymin = q025*1/4*cnst$rate_scaler,
       y = q50*1/4*cnst$rate_scaler
     ),
     fatten = 1,
@@ -589,11 +589,11 @@ fig$draftfig1a$data_f <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$draftfig1a$config$measure_f, '_q05'),
+    q025 = paste0(fig$draftfig1a$config$measure_f, '_q025'),
     q25 = paste0(fig$draftfig1a$config$measure_f, '_q25'),
     q50 = paste0(fig$draftfig1a$config$measure_f, '_q50'),
     q75 = paste0(fig$draftfig1a$config$measure_f, '_q75'),
-    q95 = paste0(fig$draftfig1a$config$measure_f, '_q95')
+    q975 = paste0(fig$draftfig1a$config$measure_f, '_q975')
   )
 fig$draftfig1a$data_m <-
   excess$excess_measures |>
@@ -606,11 +606,11 @@ fig$draftfig1a$data_m <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$draftfig1a$config$measure_m, '_q05'),
+    q025 = paste0(fig$draftfig1a$config$measure_m, '_q025'),
     q25 = paste0(fig$draftfig1a$config$measure_m, '_q25'),
     q50 = paste0(fig$draftfig1a$config$measure_m, '_q50'),
     q75 = paste0(fig$draftfig1a$config$measure_m, '_q75'),
-    q95 = paste0(fig$draftfig1a$config$measure_m, '_q95')
+    q975 = paste0(fig$draftfig1a$config$measure_m, '_q975')
   )
 
 fig$draftfig1a$fig <-
@@ -668,11 +668,11 @@ fig$draftfig1b$data_f <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$draftfig1b$config$measure_f, '_q05'),
+    q025 = paste0(fig$draftfig1b$config$measure_f, '_q025'),
     q25 = paste0(fig$draftfig1b$config$measure_f, '_q25'),
     q50 = paste0(fig$draftfig1b$config$measure_f, '_q50'),
     q75 = paste0(fig$draftfig1b$config$measure_f, '_q75'),
-    q95 = paste0(fig$draftfig1b$config$measure_f, '_q95')
+    q975 = paste0(fig$draftfig1b$config$measure_f, '_q975')
   )
 fig$draftfig1b$data_m <-
   excess$excess_measures |>
@@ -685,11 +685,11 @@ fig$draftfig1b$data_m <-
   ) |>
   select(
     region_iso, timeframe_value,
-    q05 = paste0(fig$draftfig1b$config$measure_m, '_q05'),
+    q025 = paste0(fig$draftfig1b$config$measure_m, '_q025'),
     q25 = paste0(fig$draftfig1b$config$measure_m, '_q25'),
     q50 = paste0(fig$draftfig1b$config$measure_m, '_q50'),
     q75 = paste0(fig$draftfig1b$config$measure_m, '_q75'),
-    q95 = paste0(fig$draftfig1b$config$measure_m, '_q95')
+    q975 = paste0(fig$draftfig1b$config$measure_m, '_q975')
   )
 
 fig$draftfig1b$fig <-
