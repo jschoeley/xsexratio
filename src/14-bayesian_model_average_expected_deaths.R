@@ -66,6 +66,11 @@ dat$fitted_models_with_mav <-
       region_iso == 'PT' ~ 1/7,
       region_iso == 'SI' & model_id %in% c('AVC5y', 'AVR5y') ~ 0,
       region_iso == 'SI' ~ 1/7,
+      region_iso %in% c('GB-EAW', 'GB-NIR', 'GB-SCT') &
+        model_id %in% c('GAM7yt') ~ 0,
+      region_iso %in% c('GB-EAW', 'GB-NIR', 'GB-SCT') ~ 1/8,
+      region_iso == 'IL' & model_id %in% c('GAM7yt', 'GAM7y') ~ 0,
+      region_iso == 'IL' ~ 1/7,
       TRUE ~  1/length(cnst$config$models)
     )
   ) %>%
@@ -77,6 +82,7 @@ dat$fitted_models_with_mav <-
   group_by(cv_id, region_iso) %>%
   group_modify(~ {
     cv_id <- .y[["cv_id"]]
+    region_iso <- .y[["region_iso"]]
     obs_id <- .x[1, ][["predictions"]][[1]][["obs_id"]]
     n_rows <- nrow(.x[1, ][["predictions"]][[1]])
     n_sim <- cnst$ndraws
@@ -92,7 +98,7 @@ dat$fitted_models_with_mav <-
         )
       )
     for (k in unique_models) {
-      cat(cv_id, k, "\n")
+      cat(region_iso, cv_id, k, "\n")
       predicted_and_simulated <-
         as.matrix(.x[.x$model_id == k, ][["predictions"]][[1]][, c("deaths_predicted", paste0("deaths_sim", 1:n_sim))])
       predictions_by_model[, , k] <- c(predicted_and_simulated)

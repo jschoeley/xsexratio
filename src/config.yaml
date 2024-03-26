@@ -69,38 +69,50 @@ aggregates:
       'BG',
       #'CA',
       'CH',
-      #'CL',
-      #'CZ',
+      'CL',
+      'CZ',#
       'DE',
-      #'DK',
+      'DK',#
       'EE',
       'ES',
       'FI',
       'FR',
-      #'GB-EAW',
-      #'GB-NIR',
-      #'GB-SCT',
-      #'GR',
+      'GB-EAW',#
+      'GB-NIR',#
+      'GB-SCT',#
+      'GR',#
       'HR',
       'HU',
-      #'IL',
+      'IL',#
       'IS',
       'IT',
-      #'KR',
+      'KR',#
       'LT',
       'LU',
       'LV',
       'NL',
       'NO',
-      #'NZ',
+      'NZ',#
       'PL',
       'PT',
       #'RU',
       'SE',
       'SI',
       'SK',
-      #'TW',
+      #'TW', # only available until end 22
       'US'
+    ]
+  update:
+    [
+      'CZ',
+      'DK',
+      'GB-EAW',
+      'GB-NIR',
+      'GB-SCT',
+      'GR',
+      'IL',
+      'KR',
+      'NZ'
     ]
   europe:
     [

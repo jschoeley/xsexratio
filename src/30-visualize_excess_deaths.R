@@ -49,6 +49,7 @@ fig$pscoresexdiffepiyear <- list()
 
 fig$pscoresexdiffepiyear$config <- list(
   region_iso = c('BG', 'DE', 'HU', 'IT', 'NO', 'US'),
+  #region_iso = c('GB-EAW', 'GB-SCT', 'GB-NIR', 'IL', 'CL', 'CZ'),
   measure_diff = 'psc_int_sdf',
   measure_f = 'psc_int_f',
   measure_m = 'psc_int_m'

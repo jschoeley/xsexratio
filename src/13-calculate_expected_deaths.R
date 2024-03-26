@@ -70,7 +70,8 @@ mocy_cv <- readRDS(path$mocy_cv)
 # merge data with model definitions
 dat$fit_data <-
   mocy_cv %>%
-  filter(region_iso %in% cnst$config$aggregates$analysis) %>%
+  #filter(region_iso %in% cnst$config$aggregates$analysis) %>%
+  filter(region_iso %in% cnst$config$aggregates$update) %>%
   nest(data = c(-region_iso, -cv_id)) %>%
   expand_grid(mod_para) %>%
   filter(model_id %in% cnst$config$models)
