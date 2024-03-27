@@ -423,7 +423,7 @@ excess$excess_measures <-
     # cumulative excess deaths type 1 quantiles (negative excess censored at 0)
     xr1_cum_f <- Rowquantiles(SafeColCumSum(CensorAtZero(obs_int_f-xpc_int_sim_f))/pyr_cum_f, excess$quantiles1)
     xr1_cum_m <- Rowquantiles(SafeColCumSum(CensorAtZero(obs_int_m-xpc_int_sim_m))/pyr_cum_m, excess$quantiles1)
-    xr1_cum_t <- Rowquantiles(SafeColCumSum(CensorAtZero(obs_int_t-xpc_int_sim_t))/pyr_int_t, excess$quantiles1)
+    xr1_cum_t <- Rowquantiles(SafeColCumSum(CensorAtZero(obs_int_t-xpc_int_sim_t))/pyr_cum_t, excess$quantiles1)
     colnames(xr1_cum_f) <- paste0('xr1_cum_f_', names(excess$quantiles1))
     colnames(xr1_cum_m) <- paste0('xr1_cum_m_', names(excess$quantiles1))
     colnames(xr1_cum_t) <- paste0('xr1_cum_t_', names(excess$quantiles1))
