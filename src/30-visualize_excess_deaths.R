@@ -757,7 +757,9 @@ fig$draftfig4$data_f_prevax <-
   ) |>
   group_by(region_iso, age_group) |>
   # only do with median, for prediction intervals re-implement measure
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 fig$draftfig4$data_f_postvax <-
   fig$draftfig4$data_pre |>
   filter(timeframe_value > cnst$start_of_vax_phase,
@@ -767,7 +769,9 @@ fig$draftfig4$data_f_postvax <-
     q50 = paste0(fig$draftfig4$config$measure_f, '_q50')
   ) |>
   group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 fig$draftfig4$data_f_endemic <-
   fig$draftfig4$data_pre |>
   filter(timeframe_value > cnst$start_of_endemic_phase) |>
@@ -776,7 +780,9 @@ fig$draftfig4$data_f_endemic <-
     q50 = paste0(fig$draftfig4$config$measure_f, '_q50')
   ) |>
   group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 fig$draftfig4$data_m_prevax <-
   fig$draftfig4$data_pre |>
   filter(timeframe_value <= cnst$start_of_vax_phase) |>
@@ -786,7 +792,9 @@ fig$draftfig4$data_m_prevax <-
   ) |>
   group_by(region_iso, age_group) |>
   # only do with median, for prediction intervals re-implement measure
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 fig$draftfig4$data_m_postvax <-
   fig$draftfig4$data_pre |>
   filter(timeframe_value > cnst$start_of_vax_phase,
@@ -796,7 +804,9 @@ fig$draftfig4$data_m_postvax <-
     q50 = paste0(fig$draftfig4$config$measure_m, '_q50')
   ) |>
   group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 fig$draftfig4$data_m_endemic <-
   fig$draftfig4$data_pre |>
   filter(timeframe_value > cnst$start_of_endemic_phase) |>
@@ -805,7 +815,9 @@ fig$draftfig4$data_m_endemic <-
     q50 = paste0(fig$draftfig4$config$measure_m, '_q50')
   ) |>
   group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  mutate(q50 = q50
+         #-first(q50)
+  )
 
 fig$draftfig4$fig <-
   fig$draftfig4$data_diff |>
@@ -881,9 +893,9 @@ fig$draftfig5$data_f_prevax <-
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_f, '_q50')
   ) |>
-  group_by(region_iso, age_group) |>
+  group_by(region_iso, age_group) #|>
   # only do with median, for prediction intervals re-implement measure
-  mutate(q50 = q50-first(q50))
+  #mutate(q50 = q50-first(q50))
 fig$draftfig5$data_f_postvax <-
   fig$draftfig5$data_pre |>
   filter(timeframe_value > cnst$start_of_vax_phase,
@@ -892,8 +904,8 @@ fig$draftfig5$data_f_postvax <-
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_f, '_q50')
   ) |>
-  group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  group_by(region_iso, age_group) #|>
+  #mutate(q50 = q50-first(q50))
 fig$draftfig5$data_f_endemic <-
   fig$draftfig5$data_pre |>
   filter(timeframe_value > cnst$start_of_endemic_phase) |>
@@ -901,18 +913,18 @@ fig$draftfig5$data_f_endemic <-
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_f, '_q50')
   ) |>
-  group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  group_by(region_iso, age_group) #|>
+  #mutate(q50 = q50-first(q50))
 fig$draftfig5$data_m_prevax <-
   fig$draftfig5$data_pre |>
   filter(timeframe_value <= cnst$start_of_vax_phase) |>
   select(
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_m, '_q50')
-  ) |>
-  group_by(region_iso, age_group) |>
+  ) #|>
+  #group_by(region_iso, age_group) |>
   # only do with median, for prediction intervals re-implement measure
-  mutate(q50 = q50-first(q50))
+  #mutate(q50 = q50-first(q50))
 fig$draftfig5$data_m_postvax <-
   fig$draftfig5$data_pre |>
   filter(timeframe_value > cnst$start_of_vax_phase,
@@ -920,18 +932,18 @@ fig$draftfig5$data_m_postvax <-
   select(
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_m, '_q50')
-  ) |>
-  group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  )# |>
+  #group_by(region_iso, age_group) |>
+  #mutate(q50 = q50-first(q50))
 fig$draftfig5$data_m_endemic <-
   fig$draftfig5$data_pre |>
   filter(timeframe_value > cnst$start_of_endemic_phase) |>
   select(
     region_iso, age_group, timeframe_value,
     q50 = paste0(fig$draftfig5$config$measure_m, '_q50')
-  ) |>
-  group_by(region_iso, age_group) |>
-  mutate(q50 = q50-first(q50))
+  )# |>
+  #group_by(region_iso, age_group) |>
+  #mutate(q50 = q50-first(q50))
 
 fig$draftfig5$fig <-
   fig$draftfig5$data_diff |>
