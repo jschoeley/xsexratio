@@ -278,7 +278,7 @@ fig$pscoresexdiffagepandemicperiod$fig <-
   ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '', size = 5) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '') +
   theme(panel.background = element_rect(fill = 'grey95', colour = NA)) +
   facet_wrap(~region_iso+age_group, scales = 'free_y', ncol = 4) +
   labs(
@@ -416,7 +416,7 @@ fig$excessratesexdiffpandemicperiod$fig <-
   ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '', size = 5) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '') +
   theme(panel.background = element_rect(fill = 'grey95', colour = NA)) +
   #facet_grid(region_iso~age_group, scales = 'free_y') +
   facet_wrap(~region_iso, ncol = 4, scales = 'free_y') +
@@ -557,7 +557,7 @@ fig$excessratesexdiffagepandemicperiod$fig <-
   ) +
   scale_color_identity() +
   scale_fill_identity() +
-  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '', size = 5) +
+  figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '') +
   theme(panel.background = element_rect(fill = 'grey95', colour = NA)) +
   facet_wrap(~region_iso+age_group, scales = 'free_y', ncol = 4) +
   labs(
