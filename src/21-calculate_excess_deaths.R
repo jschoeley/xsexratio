@@ -58,8 +58,11 @@ path <- list(
 
 cnst <- list(
   config = read_yaml(path$config),
+  # starting date of first included week
   analysis_start = '2020-01-27',
-  analysis_end = '2023-12-25'
+  # starting date of last included week
+  analysis_end = '2023-06-26',
+  model = 'GAM7y'
 )
 
 # global functions and constants
@@ -85,7 +88,7 @@ SafeColCumSum <- function (X) {
 observed_and_expected <-
   readRDS(path$observed_and_expected) |>
   unnest(predictions) |>
-  filter(cv_sample == 'test', model_id == 'MAV', cv_id == 0) |>
+  filter(cv_sample == 'test', model_id == cnst$model, cv_id == 0) |>
   select(
     cv_id, cv_sample, region_iso, model_id, obs_id, sex, age_group,
     iso_year, iso_week, date,
@@ -175,7 +178,7 @@ excess$observed_and_expected_weekly <-
 # <timeframe_value>, e.g. '2021-Q1' and aggregate counts
 # accordingly.
 
-# weekly 2020w5 through 2023w52
+# weekly 2020w5 through 2023w26
 excess$observed_and_expected_weekly <-
   excess$observed_and_expected_weekly |>
   filter(date >= cnst$analysis_start, date <= cnst$analysis_end) |>
@@ -184,11 +187,11 @@ excess$observed_and_expected_weekly <-
   select(cv_id, cv_sample, region_iso, model_id, age_group, sex,
          timeframe_value, everything())
 
-# total 2020w5 through 2023w52
+# total 2020w5 through 2023w26
 excess$observed_and_expected_pandemic <-
   excess$observed_and_expected_weekly |>
   filter(date >= cnst$analysis_start, date <= cnst$analysis_end) |>
-  mutate(timeframe_value = '2020w01-2023w52') |>
+  mutate(timeframe_value = '2020w05-2023w26') |>
   group_by(cv_id, cv_sample, region_iso, model_id, age_group, sex,
            timeframe_value) |>
   summarise(
@@ -217,23 +220,61 @@ excess$observed_and_expected_epiyear <-
       (iso_year == 2021 & iso_week >= 27) | (iso_year == 2022 & iso_week < 27) ~
         '2021w27-22w26',
       (iso_year == 2022 & iso_week >= 27) | (iso_year == 2023 & iso_week < 27) ~
-        '2022w27-23w26',
-      iso_year == 2023 & iso_week >= 27 ~
-        '2023w27-w52'
+        '2022w27-23w26'
     ),
     iso_year = case_when(
       timeframe_value == '2020w05-w26'  ~ 2020,
       timeframe_value == '2020w27-21w26' ~ 2020,
       timeframe_value == '2021w27-22w26' ~ 2021,
-      timeframe_value == '2022w27-23w26' ~ 2022,
-      timeframe_value == '2023w27-w52' ~ 2023
+      timeframe_value == '2022w27-23w26' ~ 2022
     ),
     iso_week = case_when(
       timeframe_value == '2020w05-w26'  ~ 5,
       timeframe_value == '2020w27-21w26' ~ 27,
       timeframe_value == '2021w27-22w26' ~ 27,
-      timeframe_value == '2022w27-23w26' ~ 27,
-      timeframe_value == '2023w27-w52' ~ 27
+      timeframe_value == '2022w27-23w26' ~ 27
+    )
+  ) |>
+  group_by(cv_id, cv_sample, region_iso, model_id, age_group,
+           sex, timeframe_value) |>
+  summarise(
+    iso_year = first(iso_year),
+    iso_week = first(iso_week),
+    date = ISOWeekDateToDate(iso_year, iso_week),
+    across(c(personweeks, deaths_predicted, deaths_observed,
+             covid_cases, covid_deaths,
+             matches('deaths_sim[[:digit:]]+$'),
+             stdpop, deaths_observed_std, deaths_predicted_std,
+             matches('deaths_sim[[:digit:]]+_std$')
+    ), ~sum(.x, na.rm = TRUE))
+  ) |>
+  ungroup()
+
+# by pandemic period
+excess$observed_and_expected_pandemicperiod <-
+  excess$observed_and_expected_weekly |>
+  filter(date >= cnst$analysis_start, date <= cnst$analysis_end) |>
+  mutate(
+    timeframe_value = case_when(
+      (iso_year == 2020 & iso_week >= 5) |
+        (iso_year == 2021 & iso_week < 17) ~
+        '2020/02-2021/04',
+      (iso_year == 2021 & iso_week >= 17) |
+        (iso_year == 2022 & iso_week < 17) ~
+        '2021/05-2022/04',
+      (iso_year == 2022 & iso_week >= 17) |
+        (iso_year == 2023 & iso_week < 27) ~
+        '2022/05-2023/07'
+    ),
+    iso_year = case_when(
+      timeframe_value == '2020/02-2021/04'  ~ 2020,
+      timeframe_value == '2021/05-2022/04' ~ 2021,
+      timeframe_value == '2022/05-2023/07' ~ 2022
+    ),
+    iso_week = case_when(
+      timeframe_value == '2020/02-2021/04'  ~ 5,
+      timeframe_value == '2021/05-2022/04' ~ 17,
+      timeframe_value == '2022/05-2023/07' ~ 17
     )
   ) |>
   group_by(cv_id, cv_sample, region_iso, model_id, age_group,
@@ -292,16 +333,17 @@ excess$observed_and_expected_monthly <-
 excess$observed_and_expected_combined <- bind_rows(
   pandemic = excess$observed_and_expected_pandemic,
   weekly = excess$observed_and_expected_weekly,
-  epiyear = excess$observed_and_expected_epiyear,
   monthly = excess$observed_and_expected_monthly,
+  epiyear = excess$observed_and_expected_epiyear,
+  pandemicperiod = excess$observed_and_expected_pandemicperiod,
   .id = 'timeframe'
 )
 
 # nest by model id and stratum
 excess$observed_and_expected_nest <-
   excess$observed_and_expected_combined |>
-  nest(data = c(timeframe_value, iso_year, iso_week, date, personweeks, stdpop,
-                covid_cases, covid_deaths,
+  nest(data = c(timeframe_value, iso_year, iso_week, date, personweeks,
+                stdpop, covid_cases, covid_deaths,
                 starts_with('deaths')))
 
 saveRDS(excess$observed_and_expected_nest,

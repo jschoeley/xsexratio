@@ -162,7 +162,7 @@ mod_para <-
           # temperature effect
           #s(epi_week, bs = 'cp', k = 12, fx = FALSE, by = temperature_anomaly) +
           # adjustment for special weeks
-          s(holiday, bs = 're') +
+          #s(holiday, bs = 're') +
           # exposures
           offset(log(personweeks))
       ),

@@ -69,8 +69,6 @@ dat$fitted_models_with_mav <-
       region_iso %in% c('GB-EAW', 'GB-NIR', 'GB-SCT') &
         model_id %in% c('GAM7yt') ~ 0,
       region_iso %in% c('GB-EAW', 'GB-NIR', 'GB-SCT') ~ 1/8,
-      region_iso == 'IL' & model_id %in% c('GAM7yt', 'GAM7y') ~ 0,
-      region_iso == 'IL' ~ 1/7,
       TRUE ~  1/length(cnst$config$models)
     )
   ) %>%
