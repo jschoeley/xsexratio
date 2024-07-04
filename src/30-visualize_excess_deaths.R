@@ -149,7 +149,7 @@ fig$pscoresexdiffpandemicperiod$fig <-
   theme(panel.background = element_rect(fill = 'grey95', colour = NA)) +
   facet_wrap(~region_iso, scales = 'free_y', ncol = 4) +
   labs(
-#    title = 'Percentage point sex gap in male vs. female annual P-scores',
+    #title = 'Percentage point sex gap in male vs. female P-scores',
     y = 'P-score difference male - female',
     # caption = paste(
     #   unlist(map2(names(cnst$period), cnst$period, paste, sep = ': ')),
