@@ -108,7 +108,7 @@ fig$pscoresexdiffpandemicperiod$fig <-
   fig$pscoresexdiffpandemicperiod$data_diff |>
   ggplot(aes(x = timeframe_value)) +
   geom_hline(yintercept = 0, color = 'grey70', size = 1) +
-  geom_line(aes(y = q50, group = '1'), color = 'grey50') +
+  geom_line(aes(y = q50, group = '1'), color = '#a34a12') +
   geom_pointrange(
     aes(
       ymax = q975/fig$pscoresexdiffpandemicperiod$config$sec_axis_scaler,
@@ -116,7 +116,8 @@ fig$pscoresexdiffpandemicperiod$fig <-
       y = q50/fig$pscoresexdiffpandemicperiod$config$sec_axis_scaler
     ),
     fatten = 1,
-    color = figspec$colors$sex['Female'],
+    color = '#184eb8',
+    shape = 1,
     position = position_nudge(x = 0.1),
     data = fig$pscoresexdiffpandemicperiod$data_f
   ) +
@@ -127,12 +128,14 @@ fig$pscoresexdiffpandemicperiod$fig <-
       y = q50/fig$pscoresexdiffpandemicperiod$config$sec_axis_scaler
     ),
     fatten = 1,
-    color = figspec$colors$sex['Male'],
+    color = '#184eb8',
+    shape = 2,
     position = position_nudge(x = -0.1),
     data = fig$pscoresexdiffpandemicperiod$data_m
   ) +
   geom_pointrange(
-    aes(ymax = q975, ymin = q025, y = q50), fatten = 2
+    aes(ymax = q975, ymin = q025, y = q50), fatten = 2,
+    color = '#a34a12'
   ) +
   scale_y_continuous(
     sec.axis = sec_axis(
@@ -143,10 +146,14 @@ fig$pscoresexdiffpandemicperiod$fig <-
       }
     )
   ) +
-  scale_color_identity() +
+  #scale_color_identity() +
   scale_fill_identity() +
   figspec$MyGGplotTheme(grid = 'y', panel_border = FALSE, axis = '') +
-  theme(panel.background = element_rect(fill = 'grey95', colour = NA)) +
+  theme(
+    panel.background = element_rect(fill = 'grey95', colour = NA),
+    axis.text.y.right = element_text(color = '#184eb8'),
+    axis.text.y.left = element_text(color = '#a34a12')
+  ) +
   facet_wrap(~region_iso, scales = 'free_y', ncol = 4) +
   labs(
     #title = 'Percentage point sex gap in male vs. female P-scores',
