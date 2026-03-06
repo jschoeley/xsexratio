@@ -52,6 +52,7 @@ path <- list(
   observed_and_expected = 'tmp/expected_deaths_cv.rds',
   # excess deaths
   excess_deaths = 'tmp/excess_deaths.rds',
+  region_metadata.csv = 'src/region_metadata.csv',
   out = 'out',
   config = 'src/config.yaml'
 )
@@ -64,6 +65,8 @@ cnst <- list(
   analysis_end = '2023-06-26',
   model = 'GAM7y'
 )
+
+region_metadata = read.csv(path$region_metadata.csv)
 
 # global functions and constants
 source(path$glob)
@@ -153,6 +156,55 @@ excess$observed_and_expected_with_agesex_totals <-
     sex = ifelse(is.na(sex), 'Total', sex)
   )
 
+# Aggregate over different spatial regions ------------------------
+
+# create a data frame with added rows for the regioncluster aggregates
+# the region iso column will identify regionclusters as well in the final output
+
+# aggregate over region clusters
+spatial_aggregation_strata_cols <-
+  c("cv_id", "cv_sample", "model_id", "regioncluster", "sex", "age_group",
+    "iso_year", "iso_week", "date")
+spatial_aggregation_value_cols <- excess$value_cols
+
+excess$observed_and_expected_with_agesex_regioncluster_totals_dt <-
+  as.data.table(excess$observed_and_expected_with_agesex_totals)
+
+# define region clusters based on region iso sets
+excess$observed_and_expected_with_agesex_regioncluster_totals_dt[
+  ,
+  regioncluster := factor(
+    region_iso,
+    levels = region_metadata$region_code,
+    labels = paste0('Total: ', region_metadata$pseudom49)
+  )
+]
+
+# sum over region clusters
+excess$observed_and_expected_with_agesex_regioncluster_totals_dt[
+  ,
+  (spatial_aggregation_value_cols) := lapply(.SD, sum),
+  by = spatial_aggregation_strata_cols,
+  .SDcols = spatial_aggregation_value_cols
+]
+
+# define region clusters as special region iso value
+excess$observed_and_expected_with_agesex_regioncluster_totals_dt[
+  ,
+  region_iso := as.character(regioncluster)
+][
+  ,
+  regioncluster := NULL
+]
+
+excess$observed_and_expected_with_agesex_regioncluster_totals_dt <-
+  rbindlist(
+    list(
+      excess$observed_and_expected_with_agesex_totals,
+      excess$observed_and_expected_with_agesex_regioncluster_totals_dt
+    )
+  ) |> as_tibble()
+
 # Account for missing data ----------------------------------------
 
 # if deaths are unknown for a given week, then set other observations
@@ -160,7 +212,7 @@ excess$observed_and_expected_with_agesex_totals <-
 # and rates over longer time periods while ignoring the part of the
 # period which is unobserved.
 excess$observed_and_expected_weekly <-
-  excess$observed_and_expected_with_agesex_totals |>
+  excess$observed_and_expected_with_agesex_regioncluster_totals_dt |>
   mutate(across(
     c(
       personweeks, stdpop,
@@ -370,7 +422,7 @@ excess$excess_measures <-
   group_modify(~{
 
     cat(.y[['timeframe']], .y[['cv_id']], .y[['model_id']],
-        .y[['region_iso']], .y[['sex']],
+        .y[['region_iso']],
         as.character(.y[['age_group']]), '\n')
 
     # are we looking at all ages?

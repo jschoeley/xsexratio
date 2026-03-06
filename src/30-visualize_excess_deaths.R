@@ -587,3 +587,67 @@ ExportFigure(
   height = figspec$fig_dims$width,
   scale = 1
 )
+
+# Tabulate excess death sex differences -----------------------------------
+
+table_sa <-
+  excess$excess_measures |>
+  filter(
+    grepl('^Total: ', region_iso),
+    timeframe == 'pandemicperiod',
+    age_group == 'Total'
+  ) |>
+  mutate(
+    region_iso = substring(region_iso, 8)
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    xr1_int_sdf_q50, xr1_int_sdf_q025, xr1_int_sdf_q975
+  ) |>
+  mutate(
+    label = paste0(
+      formatC(round(xr1_int_sdf_q50*100000, 0), format = 'd'),
+      ' (',
+      formatC(round(xr1_int_sdf_q025*100000, 0), format = 'd'),
+      ', ',
+      formatC(round(xr1_int_sdf_q975*100000, 0), format = 'd'),
+      ')'
+    )
+  ) |>
+  select(-xr1_int_sdf_q50, -xr1_int_sdf_q025, -xr1_int_sdf_q975) |>
+  pivot_wider(
+    id_cols = region_iso,
+    names_from = timeframe_value,
+    values_from = label
+  )
+
+table_sb <-
+  excess$excess_measures |>
+  filter(
+    grepl('^Total: ', region_iso),
+    timeframe == 'pandemicperiod',
+    age_group == 'Total'
+  ) |>
+  mutate(
+    region_iso = substring(region_iso, 8)
+  ) |>
+  select(
+    region_iso, timeframe_value,
+    psc_int_sdf_q50, psc_int_sdf_q025, psc_int_sdf_q975
+  ) |>
+  mutate(
+    label = paste0(
+      formatC(psc_int_sdf_q50, format = 'f', digits = 1),
+      ' (',
+      formatC(psc_int_sdf_q025, format = 'f', digits = 1),
+      ', ',
+      formatC(psc_int_sdf_q975, format = 'f', digits = 1),
+      ')'
+    )
+  ) |>
+  select(-psc_int_sdf_q50, -psc_int_sdf_q025, -psc_int_sdf_q975) |>
+  pivot_wider(
+    id_cols = region_iso,
+    names_from = timeframe_value,
+    values_from = label
+  )
